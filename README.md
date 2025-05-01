@@ -54,7 +54,7 @@ A web-based application to manage employee attendance and facilitate lunch plann
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-repo/lunch-attendance-system.git
+   git clone https://github.com/SammedBG/Attendance-and-Lunch-Management-System.git
    cd lunch-attendance-system
    ```
 
