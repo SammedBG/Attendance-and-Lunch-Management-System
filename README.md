@@ -38,8 +38,13 @@ Lunch_attendence_system/
 
 1. **Clone the repository:**
    ```bash
+<<<<<<< HEAD
    git clone <repository-url>
    cd Lunch_attendence_system
+=======
+   git clone https://github.com/SammedBG/Attendance-and-Lunch-Management-System.git
+   cd lunch-attendance-system
+>>>>>>> dfed697274375b4cfeb0034df452e07023245499
    ```
 
 2. **Install frontend dependencies:**
@@ -221,6 +226,7 @@ cd backend
 npm start
 # Ensure MongoDB is accessible and environment variables are set
 ```
+<<<<<<< HEAD
 
 ## 🤝 Contributing
 
@@ -237,3 +243,46 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For support and questions, please open an issue in the repository.
+=======
+.
+├── .env
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+├── vite.config.ts
+├── server/
+│   └── index.js
+└── src/
+    ├── App.tsx
+    ├── index.css
+    ├── main.tsx
+    ├── vite-env.d.ts
+    ├── components/
+    │   ├── admin/
+    │   │   ├── AttendanceReport.tsx
+    │   │   ├── AttendanceStats.tsx
+    │   │   └── UserManagement.tsx
+    │   ├── common/
+    │   │   └── ProtectedRoute.tsx
+    │   └── employee/
+    │       ├── AttendanceCalendar.tsx
+    │       └── AttendanceForm.tsx
+    ├── contexts/
+    │   └── AuthContext.tsx
+    ├── pages/
+    │   ├── AdminDashboard.tsx
+    │   ├── ChefDashboard.tsx
+    │   ├── EmployeeDashboard.tsx
+    │   └── Login.tsx
+    └── services/
+        └── api.ts
+```
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+>>>>>>> dfed697274375b4cfeb0034df452e07023245499
