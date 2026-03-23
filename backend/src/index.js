@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 
 // Import configurations
 import connectDB from './config/database.js';
@@ -17,6 +18,10 @@ import chefRoutes from './routes/chef.js';
 
 // Load environment variables
 dotenv.config();
+
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key_here' && process.env.NODE_ENV === 'production') {
+  console.warn('WARNING: Your JWT_SECRET is extremely weak or missing!');
+}
 
 // Initialize express app
 const app = express();
@@ -40,6 +45,9 @@ app.use('/api', apiLimiter);
 // Standard Middleware
 app.use(cors());
 app.use(express.json());
+
+// Sanitize user-supplied data to prevent MongoDB Operator Injection
+app.use(mongoSanitize());
 
 // Connect to database
 connectDB();
