@@ -10,6 +10,9 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/database.js';
 import { setupCronJobs } from './config/cron.js';
 import { seedData } from './config/seed.js';
+import logger from './config/logger.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -21,7 +24,7 @@ import chefRoutes from './routes/chef.js';
 dotenv.config();
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key_here' && process.env.NODE_ENV === 'production') {
-  console.warn('WARNING: Your JWT_SECRET is extremely weak or missing!');
+  logger.warn('WARNING: Your JWT_SECRET is extremely weak or missing!');
 }
 
 // Initialize express app
@@ -63,6 +66,19 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chef', chefRoutes);
 
+// Interactive API Documentation Sandbox
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteTitle: "API Documentation" }));
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: API Health Check
+ *     description: Returns the operational status and localized timestamp of the API Server
+ *     responses:
+ *       200:
+ *         description: Server is highly operational.
+ */
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running', timestamp: new Date().toISOString() });
@@ -75,13 +91,15 @@ app.use('*', (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  logger.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Enterprise Server running cleanly on port ${PORT}`);
+  logger.info(`Swagger Sandbox live at http://localhost:${PORT}/api-docs`);
   setupCronJobs();
   seedData();
 });
