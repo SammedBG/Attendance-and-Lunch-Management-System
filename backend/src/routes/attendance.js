@@ -11,18 +11,18 @@ router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (r
     const { status, date } = req.body;
     const userId = req.user.id;
 
+    // Parse the incoming 'yyyy-MM-dd' string as UTC midnight
     const reqDate = new Date(date);
     reqDate.setUTCHours(0, 0, 0, 0);
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    // Calculate current 'today' reliably in IST (+05:30)
+    const now = new Date();
+    const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    // Create a UTC midnight representation representing the current IST day
+    const today = new Date(Date.UTC(istTime.getUTCFullYear(), istTime.getUTCMonth(), istTime.getUTCDate()));
 
     if (reqDate.getTime() === today.getTime()) {
-      // Convert current server time to fixed +05:30 IST
-      // This ensures 9:30 AM cutoff behaves identically regardless of VPS timezone
-      const now = new Date();
-      
-      const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
       const currentHour = istTime.getUTCHours();
       const currentMinute = istTime.getUTCMinutes();
       

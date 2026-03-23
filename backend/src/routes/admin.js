@@ -82,7 +82,7 @@ router.get('/reports/trends', authMiddleware, roleMiddleware(['admin']), async (
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone: "+05:30" } },
           officeCount: { $sum: { $cond: [{ $eq: ["$status", "office"] }, 1, 0] } },
           homeCount: { $sum: { $cond: [{ $eq: ["$status", "home"] }, 1, 0] } },
           leaveCount: { $sum: { $cond: [{ $eq: ["$status", "leave"] }, 1, 0] } }
