@@ -8,7 +8,6 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
   const [status, setStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [isDisabled, setIsDisabled] = useState(false);
   
   const formattedDate = format(selectedDate, 'yyyy-MM-dd');
