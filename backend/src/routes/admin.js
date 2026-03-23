@@ -6,6 +6,7 @@ import { roleMiddleware } from '../middleware/role.js';
 
 const router = express.Router();
 
+
 // Get daily report
 router.get('/reports/daily', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
