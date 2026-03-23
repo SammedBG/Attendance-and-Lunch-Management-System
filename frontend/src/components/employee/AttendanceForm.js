@@ -31,6 +31,7 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
       setIsDisabled(false);
       setError('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, isToday, isPastCutoff]);
   
   // Fetch current attendance for selected date

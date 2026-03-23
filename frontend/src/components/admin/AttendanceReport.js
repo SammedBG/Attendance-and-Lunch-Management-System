@@ -11,6 +11,7 @@ const AttendanceReport = () => {
   
   useEffect(() => {
     fetchReport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
   
   const fetchReport = async () => {

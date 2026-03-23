@@ -11,6 +11,7 @@ const AttendanceStats = () => {
   
   useEffect(() => {
     fetchTrends();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
   
   const fetchTrends = async () => {

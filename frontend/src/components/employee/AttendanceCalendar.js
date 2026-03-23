@@ -10,9 +10,13 @@ const AttendanceCalendar = ({ onDateSelect }) => {
   const [attendanceData, setAttendanceData] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const month = value.getMonth();
+  const year = value.getFullYear();
+
   useEffect(() => {
     loadMonthlyAttendance();
-  }, [value.getMonth(), value.getFullYear()]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [month, year]);
 
   const loadMonthlyAttendance = async () => {
     try {
@@ -87,6 +91,8 @@ const AttendanceCalendar = ({ onDateSelect }) => {
         break;
       case 'leave':
         classes.push('bg-amber-100', 'hover:bg-amber-200');
+        break;
+      default:
         break;
     }
     
