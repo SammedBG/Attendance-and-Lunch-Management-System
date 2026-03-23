@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -13,6 +14,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Toaster position="top-right" duration={3500} />
+      <Analytics />
       <Router>
         <AuthProvider>
           <div className="min-h-screen bg-gray-50">
