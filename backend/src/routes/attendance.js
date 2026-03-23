@@ -18,12 +18,14 @@ router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (r
     today.setUTCHours(0, 0, 0, 0);
 
     if (reqDate.getTime() === today.getTime()) {
+      // Convert current server time to fixed +05:30 IST
+      // This ensures 9:30 AM cutoff behaves identically regardless of VPS timezone
       const now = new Date();
-      // Using UTC for consistent cutoff times or local depending on server
-      // Converting to IST or keeping server time (which is common)
-      // Since frontend checks local time (getHours), we'll perform a basic check on server's time
-      const currentHour = now.getHours();
-      const currentMinute = now.getMinutes();
+      
+      const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+      const currentHour = istTime.getUTCHours();
+      const currentMinute = istTime.getUTCMinutes();
+      
       const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
       
       if (isPastCutoff) {

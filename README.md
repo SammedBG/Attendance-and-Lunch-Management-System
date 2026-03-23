@@ -1,288 +1,166 @@
-# Lunch & Attendance Management System
+# 🍱 Lunch & Attendance Management System
 
-A full-stack web application to manage employee attendance and facilitate lunch planning for organizations. This project provides separate dashboards for Employees, Chefs, and Admins with a clean separation between frontend and backend.
+A robust, full-stack web application designed to manage everyday employee attendance and accurately facilitate lunch planning for organizations. This system solves office logistic requirements by giving separate, dedicated operational dashboards to **Employees**, **Chefs**, and **Administrators** through a clean frontend/backend architecture.
 
-## 🏗️ Project Structure
+---
 
-```
+## 🚀 Key Features
+
+### Employee Dashboard
+- **Daily Check-Ins:** Mark attendance simply as `Office`, `Home`, or `Leave`.
+- **Calendar Perspective:** Visualize historical check-ins immediately via a monthly calendar widget.
+- **Automated Cutoff Enforcement:** Employees checking in past 9:30 AM automatically roll over to the next day, ensuring chef planning numbers stay entirely accurate.
+
+### Chef Dashboard
+- **Real-Time Logistics:** View precise daily counts of incoming, on-site employees.
+- **Resource Management:** Plan meal preparations adequately based on real-time data, reducing food waste and ensuring nobody goes hungry.
+
+### Administrator Console
+- **Detailed Reports:** Analyze extensive daily and monthly attendance histories.
+- **Attendance Trend Graphs:** Track visual trends of Office/Home/Leave frequencies utilizing fast MongoDB aggregation pipelines.
+- **Role Management:** Full lifecycle control of users, allowing role swapping on the fly (Promote to Chef/Admin).
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend**
+- **Framework:** React 18 (Create React App) with JavaScript (ES6+)
+- **Styling:** Tailwind CSS for rapid responsive design
+- **Routing:** React Router v6
+- **Data Visualization:** Recharts
+- **Networking:** Axios, Date-fns
+
+**Backend**
+- **Runtime:** Node.js & Express.js
+- **Database:** MongoDB with Mongoose ODM
+- **Authentication:** JWT (JSON Web Tokens) with Bcrypt password hashing
+- **Security:** Helmet, Express Rate Limit, CORS
+- **Scheduling:** Node-Cron (for automated Chef notifications)
+
+---
+
+## 🏗️ Project Architecture
+
+```text
 Lunch_attendence_system/
-├── frontend/                 # Create React App (JavaScript)
+├── frontend/                 # React Application
+│   ├── public/               # Static web assets
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   ├── pages/           # Page components
-│   │   ├── contexts/        # React contexts
-│   │   └── services/        # API services
-│   ├── public/              # Static assets
-│   ├── package.json         # Frontend dependencies
-│   └── ...                  # Frontend config files
-├── backend/                 # Express.js API Server (Modular)
+│   │   ├── components/       # Common, Admin, and Employee atomic components
+│   │   ├── contexts/         # React Context API providers (Auth)
+│   │   ├── pages/            # Top-level Page views
+│   │   └── services/         # Axios API definitions
+│   └── package.json    
+├── backend/                  # Express.js REST API
 │   ├── src/
-│   │   ├── config/          # Configuration files
-│   │   ├── middleware/      # Custom middleware
-│   │   ├── models/          # Database models
-│   │   ├── routes/          # API routes
-│   │   └── index.js         # Main server file
-│   ├── package.json         # Backend dependencies
-│   └── .env                 # Environment variables
+│   │   ├── config/           # DB Configuration, Cron Jobs, Sample Seed Data
+│   │   ├── middleware/       # JWT Authentication & Role authorization
+│   │   ├── models/           # Mongoose schemas (User, Attendance)
+│   │   ├── routes/           # Separated route controllers
+│   │   └── index.js          # Entry-point
+│   └── package.json        
+├── start-dev.bat             # Windows Startup Script
+├── start-dev.sh              # Unix/Mac Startup Script
 └── README.md
 ```
 
-## 🚀 Quick Start
+---
+
+## ⚙️ Local Development Setup
 
 ### Prerequisites
-- Node.js (v16 or later)
-- MongoDB (local installation or cloud instance)
-- npm (v8 or later)
+- [Node.js](https://nodejs.org/) (v16.x or newer recommended)
+- [MongoDB](https://www.mongodb.com/) (Local installation or Atlas URI instance)
 
-### Installation
+### 1. Installation
 
-1. **Clone the repository:**
-   ```bash
-<<<<<<< HEAD
-   git clone <repository-url>
-   cd Lunch_attendence_system
-=======
-   git clone https://github.com/SammedBG/Attendance-and-Lunch-Management-System.git
-   cd lunch-attendance-system
->>>>>>> dfed697274375b4cfeb0034df452e07023245499
-   ```
+Clone the repository and install the respective dependencies:
 
-2. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   ```
+```bash
+git clone https://github.com/SammedBG/Attendance-and-Lunch-Management-System.git
+cd Attendance-and-Lunch-Management-System
 
-3. **Install backend dependencies:**
-   ```bash
-   cd ../backend
-   npm install
-   ```
+# Install frontend dependencies
+cd frontend
+npm install
 
-4. **Set up environment variables:**
-   ```bash
-   # Create .env file in backend directory
-   cd backend
-   # Create .env file with your configuration
-   ```
-
-5. **Start the applications:**
-
-   **Option 1: Using startup scripts (Recommended)**
-   ```bash
-   # Windows
-   start-dev.bat
-   
-   # Linux/Mac
-   chmod +x start-dev.sh
-   ./start-dev.sh
-   ```
-
-   **Option 2: Manual startup**
-   ```bash
-   # Terminal 1 - Start backend
-   cd backend
-   npm run dev
-   
-   # Terminal 2 - Start frontend
-   cd frontend
-   npm start
-   ```
-
-## 📋 Available Scripts
-
-### Frontend Scripts (in `frontend/` directory)
-- `npm start` - Start Create React App development server
-- `npm run build` - Build for production
-- `npm test` - Run tests
-- `npm run eject` - Eject from Create React App (irreversible)
-
-### Backend Scripts (in `backend/` directory)
-- `npm run dev` - Start server with auto-reload
-- `npm start` - Start server in production mode
-- `npm test` - Run tests
-
-## 🎯 Features
-
-### Employee Dashboard
-- Mark attendance (`office`, `home`, or `leave`)
-- View and update attendance on a calendar
-- Cutoff time enforcement for same-day attendance submission (9:30 AM)
-
-### Chef Dashboard
-- View daily employee count for on-site attendance
-- Receive scheduled notifications at 9:30 AM to plan lunch
-
-### Admin Dashboard
-- View detailed daily attendance reports
-- Visualize attendance trends over time
-- Manage user accounts and update roles
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **React 18.3.1** with TypeScript
-- **Vite** for build tooling
-- **Tailwind CSS** for styling
-- **React Router** for navigation
-- **Recharts** for data visualization
-- **Axios** for API calls
-- **date-fns** for date handling
-
-### Backend
-- **Express.js** with Node.js
-- **MongoDB** with Mongoose ODM
-- **JWT** for authentication
-- **bcryptjs** for password hashing
-- **Node-Cron** for scheduled tasks
-- **Helmet** for security headers
-- **CORS** for cross-origin requests
-- **Winston** for logging
-
-## 🔐 Authentication & Security
-
-- JWT-based authentication with 7-day token expiration
-- Role-based access control (admin, employee, chef)
-- Password hashing with bcryptjs
-- Protected routes with automatic redirection
-- Rate limiting and security headers
-
-## 📊 Database Schema
-
-### User Model
-```javascript
-{
-  name: String (required),
-  email: String (required, unique),
-  password: String (hashed, required),
-  role: String (enum: ['admin', 'employee', 'chef'])
-}
+# Install backend dependencies
+cd ../backend
+npm install
 ```
 
-### Attendance Model
-```javascript
-{
-  userId: ObjectId (ref: User),
-  date: Date (required),
-  status: String (enum: ['office', 'home', 'leave']),
-  createdAt: Date (default: now)
-}
-```
+### 2. Environment Configuration
 
-## 🌐 API Endpoints
+Create a `.env` file inside the `backend/` directory providing these configuration variables:
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user
-
-### Attendance
-- `POST /api/attendance` - Mark attendance
-- `GET /api/attendance` - Get attendance records
-- `GET /api/attendance/monthly` - Get monthly attendance
-
-### Admin
-- `GET /api/admin/reports/daily` - Daily attendance report
-- `GET /api/admin/reports/trends` - Attendance trends
-- `GET /api/admin/users` - Get all users
-- `PUT /api/admin/users/:id/role` - Update user role
-
-### Chef
-- `GET /api/chef/daily-count` - Get daily office count
-
-## 🔧 Development
-
-### Environment Variables
-Create a `.env` file in the root directory:
-   ```
-   PORT=5000
-JWT_SECRET=your_jwt_secret_key_here
-   MONGO_URI=mongodb://localhost:27017/lunch-attendance
+```env
+PORT=5000
+JWT_SECRET=your_super_secret_jwt_key
+MONGO_URI=mongodb://127.0.0.1:27017/lunch-attendance
 NODE_ENV=development
 ```
 
-### Database Setup
-1. Install MongoDB locally or use MongoDB Atlas
-2. Update the `MONGO_URI` in your `.env` file
-3. The application will automatically create the database and seed initial data
+*(Note: The Frontend dynamically defaults to `http://localhost:5000/api` natively, however, `REACT_APP_API_URL` can be defined if you run the backend on a different port).*
 
-### Default Users (Seeded Automatically)
-- **Admin**: admin@example.com / admin123
-- **Employee**: employee@example.com / employee123
-- **Chef**: chef@example.com / chef123
+### 3. Start the Ecosystem
 
-## 📦 Deployment
+You can orchestrate both systems manually, or utilize the helper scripts:
 
-### Frontend Deployment
+**Using helper scripts (from the project root):**
 ```bash
-cd frontend
-npm run build
-# Deploy the 'dist' folder to your hosting service
+# On Windows
+./start-dev.bat
+
+# On Linux or Mac
+chmod +x start-dev.sh
+./start-dev.sh
 ```
 
-### Backend Deployment
-   ```bash
-cd backend
-npm start
-# Ensure MongoDB is accessible and environment variables are set
+**Manual Start:**
+```bash
+# Terminal window 1 (Backend)
+cd backend && npm run dev
+
+# Terminal window 2 (Frontend)
+cd frontend && npm start
 ```
-<<<<<<< HEAD
 
-## 🤝 Contributing
+*The API will be available at `http://localhost:5000` and the web portal will execute at `http://localhost:3000`.*
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+---
 
-## 📄 License
+## 🔐 Default Seed Data & Users
 
-This project is licensed under the MIT License.
+On the initial backend boot, the database is dynamically populated with default users (if the collections are empty) to expedite development testing:
 
-## 🆘 Support
+| Role | Email Address | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | `admin123` |
+| **Chef** | `chef@example.com` | `chef123` |
+| **Employee** | `employee@example.com` | `employee123` |
 
-For support and questions, please open an issue in the repository.
-=======
-.
-├── .env
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package.json
-├── postcss.config.js
-├── tailwind.config.js
-├── tsconfig.app.json
-├── tsconfig.json
-├── tsconfig.node.json
-├── vite.config.ts
-├── server/
-│   └── index.js
-└── src/
-    ├── App.tsx
-    ├── index.css
-    ├── main.tsx
-    ├── vite-env.d.ts
-    ├── components/
-    │   ├── admin/
-    │   │   ├── AttendanceReport.tsx
-    │   │   ├── AttendanceStats.tsx
-    │   │   └── UserManagement.tsx
-    │   ├── common/
-    │   │   └── ProtectedRoute.tsx
-    │   └── employee/
-    │       ├── AttendanceCalendar.tsx
-    │       └── AttendanceForm.tsx
-    ├── contexts/
-    │   └── AuthContext.tsx
-    ├── pages/
-    │   ├── AdminDashboard.tsx
-    │   ├── ChefDashboard.tsx
-    │   ├── EmployeeDashboard.tsx
-    │   └── Login.tsx
-    └── services/
-        └── api.ts
-```
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
->>>>>>> dfed697274375b4cfeb0034df452e07023245499
+---
+
+## 🌐 API Endpoints Reference
+
+| Application Space | HTTP Request | Endpoint URI | Description |
+| :--- | :--- | :--- | :--- |
+| **Authentication** | `POST` | `/api/auth/login` | Authenticate and retrieve JWT token |
+| | `POST` | `/api/auth/register` | Register new employee entity |
+| | `GET` | `/api/auth/me` | Refresh token profiles & user mapping |
+| **Attendance** | `POST` | `/api/attendance` | Process daily check-in (requires employee access) |
+| | `GET` | `/api/attendance` | Retrieve historical individual records |
+| | `GET` | `/api/attendance/monthly` | Retrieve aggregated individual monthly spread |
+| **Chef** | `GET` | `/api/chef/daily-count` | Live summary metric of 'Office' check-ins |
+| **Admin** | `GET` | `/api/admin/reports/daily` | Highly-detailed daily individual check-out ledger |
+| | `GET` | `/api/admin/reports/trends` | Time-series chart aggregations |
+| | `GET` | `/api/admin/users` | List platform accounts |
+| | `PUT` | `/api/admin/users/:userId/role` | Escalate or demote user permissions |
+
+---
+
+## 📄 License & Contributing
+
+This software is provided under the [MIT License](LICENSE).
+Contributions, bug reports, and pull requests are welcomed to help mature the product footprint. Please make sure to test UI interactions against existing rules before pushing branches.
