@@ -12,7 +12,7 @@ const AttendanceCalendar = ({ onDateSelect }) => {
 
   useEffect(() => {
     loadMonthlyAttendance();
-  }, [value]);
+  }, [value.getMonth(), value.getFullYear()]);
 
   const loadMonthlyAttendance = async () => {
     try {

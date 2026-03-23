@@ -43,12 +43,14 @@ router.get('/reports/daily', authMiddleware, roleMiddleware(['admin']), async (r
       date: { $gte: targetDate, $lt: nextDay }
     }).populate('userId', 'name email');
 
-    const employees = attendanceRecords.map(record => ({
-      id: record.userId._id,
-      name: record.userId.name,
-      email: record.userId.email,
-      status: record.status
-    }));
+    const employees = attendanceRecords
+      .filter(record => record.userId !== null)
+      .map(record => ({
+        id: record.userId._id,
+        name: record.userId.name,
+        email: record.userId.email,
+        status: record.status
+      }));
     
     res.json({
       date: targetDate,
@@ -72,40 +74,33 @@ router.get('/reports/trends', authMiddleware, roleMiddleware(['admin']), async (
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
-    // Get attendance counts for each day in the date range
-    const days = [];
-    let currentDate = new Date(start);
-    
-    while (currentDate <= end) {
-      const nextDay = new Date(currentDate);
-      nextDay.setDate(nextDay.getDate() + 1);
+    const trends = await Attendance.aggregate([
+      {
+        $match: {
+          date: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          officeCount: { $sum: { $cond: [{ $eq: ["$status", "office"] }, 1, 0] } },
+          homeCount: { $sum: { $cond: [{ $eq: ["$status", "home"] }, 1, 0] } },
+          leaveCount: { $sum: { $cond: [{ $eq: ["$status", "leave"] }, 1, 0] } }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
 
-      const officeCount = await Attendance.countDocuments({
-        date: { $gte: currentDate, $lt: nextDay },
-        status: 'office'
-      });
+    const formattedTrends = trends.map(t => ({
+      date: new Date(t._id),
+      officeCount: t.officeCount,
+      homeCount: t.homeCount,
+      leaveCount: t.leaveCount
+    }));
 
-      const homeCount = await Attendance.countDocuments({
-        date: { $gte: currentDate, $lt: nextDay },
-        status: 'home'
-      });
-      
-      const leaveCount = await Attendance.countDocuments({
-        date: { $gte: currentDate, $lt: nextDay },
-        status: 'leave'
-      });
-
-      days.push({
-        date: new Date(currentDate),
-        officeCount,
-        homeCount,
-        leaveCount
-      });
-
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    res.json(days);
+    res.json(formattedTrends);
   } catch (error) {
     console.error('Get trends error:', error);
     res.status(500).json({ message: 'Server error' });

@@ -11,10 +11,32 @@ router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (r
     const { status, date } = req.body;
     const userId = req.user.id;
 
-    // Check if an attendance record already exists for this date
+    const reqDate = new Date(date);
+    reqDate.setUTCHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    if (reqDate.getTime() === today.getTime()) {
+      const now = new Date();
+      // Using UTC for consistent cutoff times or local depending on server
+      // Converting to IST or keeping server time (which is common)
+      // Since frontend checks local time (getHours), we'll perform a basic check on server's time
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
+      
+      if (isPastCutoff) {
+         return res.status(400).json({ message: 'Past 9:30 AM cutoff time for today' });
+      }
+    } else if (reqDate.getTime() < today.getTime()) {
+       return res.status(400).json({ message: 'Cannot mark attendance for past dates' });
+    }
+
+    // Check if an attendance record already exists for this exact date (now normalized)
     const existingRecord = await Attendance.findOne({
       userId,
-      date: { $gte: new Date(date), $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1)) }
+      date: reqDate
     });
 
     if (existingRecord) {
@@ -27,7 +49,7 @@ router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (r
     // Create new attendance record
     const attendance = new Attendance({
       userId,
-      date: new Date(date),
+      date: reqDate,
       status
     });
 
