@@ -11,16 +11,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        try {
-          const response = await api.get('/auth/me');
-          setUser(response.data);
-          redirectBasedOnRole(response.data.role);
-        } catch (error) {
-          handleLogout();
-        }
+      try {
+        const response = await api.get('/auth/me');
+        setUser(response.data);
+        redirectBasedOnRole(response.data.role);
+      } catch (error) {
+        // Only trigger logout logic if there was an actual auth error 
+        console.error('Session check failed', error);
       }
       setIsLoading(false);
     };
@@ -49,10 +46,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await api.post('/auth/login', { email, password });
-      const { token, user } = response.data;
+      const { user } = response.data;
 
-      localStorage.setItem('token', token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
       redirectBasedOnRole(user.role);
     } catch (error) {
@@ -63,9 +58,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    delete api.defaults.headers.common['Authorization'];
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error UI side', error);
+    }
     setUser(null);
     navigate('/login');
   };

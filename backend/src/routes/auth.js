@@ -79,8 +79,15 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    // Set HTTP-only, secure cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Support for Cross-Origin prod vs Same-Origin dev
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     res.json({
-      token,
       user: {
         id: user._id,
         name: user.name,
@@ -92,6 +99,16 @@ router.post('/login', async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  });
+  res.json({ message: 'Logged out successfully' });
 });
 
 // Get current user

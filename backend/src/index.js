@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
+import cookieParser from 'cookie-parser';
 
 // Import configurations
 import connectDB from './config/database.js';
@@ -43,7 +44,11 @@ const apiLimiter = rateLimit({
 app.use('/api', apiLimiter);
 
 // Standard Middleware
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Sanitize user-supplied data to prevent MongoDB Operator Injection
