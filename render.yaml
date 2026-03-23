@@ -1,0 +1,29 @@
+services:
+  # Backend Node.js API Service
+  - type: web
+    name: lunch-attendance-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+
+  # Frontend Static Site Service
+  - type: static
+    name: lunch-attendance-web
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: lunch-attendance-api
+          envVarKey: RENDER_EXTERNAL_URL
