@@ -34,135 +34,154 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      <div className="bg-blue-700 text-white md:w-1/2 flex flex-col justify-center p-12">
-        <h1 className="text-4xl font-bold mb-8">Lunch & Attendance Management</h1>
-        <p className="text-xl mb-10">Streamline your daily operations with our smart management system.</p>
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden relative">
+      {/* Ambient Animated Blurred Orbs */}
+      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[120px] animate-float pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[100px] animate-float pointer-events-none" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[20%] right-[15%] w-[25%] h-[25%] bg-blue-500/15 rounded-full blur-[80px] animate-float pointer-events-none" style={{ animationDelay: '4s' }}></div>
+
+      {/* Main Glass Panel */}
+      <div className="glass-dark z-10 w-full max-w-5xl rounded-[2.5rem] flex flex-col md:flex-row overflow-hidden m-6 transition-all duration-700">
         
-        <div className="space-y-8">
-          <div className="flex items-start space-x-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
-              <Calendar className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Attendance Tracking</h3>
-              <p className="text-blue-100">Mark attendance and plan your schedule with ease</p>
-            </div>
-          </div>
+        {/* Left Presentation Side */}
+        <div className="md:w-[45%] p-10 lg:p-16 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/10 relative overflow-hidden bg-white/[0.02]">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
           
-          <div className="flex items-start space-x-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
-              <Utensils className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Lunch Planning</h3>
-              <p className="text-blue-100">Chef receives automated count for efficient lunch preparation</p>
-            </div>
-          </div>
+          <h1 className="text-4xl lg:text-[42px] font-bold mb-6 text-white leading-tight z-10 tracking-tight">
+            Lunch <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">&</span> Attendance
+          </h1>
+          <p className="text-base text-slate-300 mb-10 z-10 font-light leading-relaxed">
+            Streamline your daily operations with an intelligent, elegant, and highly secure workspace ecosystem.
+          </p>
           
-          <div className="flex items-start space-x-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
-              <UserCog className="h-6 w-6" />
+          <div className="space-y-7 z-10">
+            <div className="flex items-start space-x-4 opacity-80 hover:opacity-100 transition duration-300 group">
+              <div className="bg-white/5 border border-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform shadow-[0_4px_20px_rgb(0,0,0,0.1)]">
+                <Calendar className="h-6 w-6 text-indigo-300" />
+              </div>
+              <div className="pt-1">
+                <h3 className="font-semibold text-white tracking-wide text-sm uppercase">Attendance Tracking</h3>
+                <p className="text-slate-400 text-sm mt-0.5 font-light">Log operations smoothly.</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-lg">Admin Dashboard</h3>
-              <p className="text-blue-100">Comprehensive reports and attendance analytics</p>
+            
+            <div className="flex items-start space-x-4 opacity-80 hover:opacity-100 transition duration-300 group">
+              <div className="bg-white/5 border border-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform shadow-[0_4px_20px_rgb(0,0,0,0.1)]">
+                <Utensils className="h-6 w-6 text-purple-300" />
+              </div>
+              <div className="pt-1">
+                <h3 className="font-semibold text-white tracking-wide text-sm uppercase">Smart Catering</h3>
+                <p className="text-slate-400 text-sm mt-0.5 font-light">Real-time lunch scaling.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-4 opacity-80 hover:opacity-100 transition duration-300 group">
+              <div className="bg-white/5 border border-white/10 p-3 rounded-2xl group-hover:scale-110 transition-transform shadow-[0_4px_20px_rgb(0,0,0,0.1)]">
+                <UserCog className="h-6 w-6 text-blue-300" />
+              </div>
+              <div className="pt-1">
+                <h3 className="font-semibold text-white tracking-wide text-sm uppercase">Executive Dashboard</h3>
+                <p className="text-slate-400 text-sm mt-0.5 font-light">High precision analytics.</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <div className="md:w-1/2 flex items-center justify-center p-12">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-800">
-              {isRegistering ? 'Create Account' : 'Welcome Back'}
-            </h2>
-            <p className="text-gray-600 mt-2">
-              {isRegistering ? 'Sign up to get started' : 'Sign in to continue to your dashboard'}
-            </p>
-          </div>
+        
+        {/* Right Form Side */}
+        <div className="md:w-[55%] p-10 lg:p-16 flex items-center justify-center bg-slate-900/40 relative">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 pointer-events-none"></div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="w-full max-w-[380px] z-10">
+            <div className="mb-10">
+              <h2 className="text-3xl font-bold text-white tracking-tight">
+                {isRegistering ? 'Create Profile' : 'Welcome Back'}
+              </h2>
+              <p className="text-slate-400 mt-2 font-light">
+                {isRegistering ? 'Initialize your platform credentials' : 'Authenticate to access dashboards'}
+              </p>
+            </div>
             
-            {isRegistering && (
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {isRegistering && (
+                <div className="space-y-1.5">
+                  <label htmlFor="name" className="block text-xs font-semibold text-slate-300 uppercase tracking-widest ml-1">
+                    Full Name
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required={isRegistering}
+                    className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all shadow-inner"
+                    placeholder="John Doe"
+                  />
+                </div>
+              )}
+              
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-xs font-semibold text-slate-300 uppercase tracking-widest ml-1">
+                  Email Configuration
                 </label>
                 <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required={isRegistering}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Enter your full name"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all shadow-inner"
+                  placeholder="name@company.com"
                 />
               </div>
-            )}
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                placeholder="Enter your email"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                placeholder="Enter your password"
-              />
-            </div>
-            
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-medium transition duration-200 flex justify-center items-center"
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  {isRegistering ? (
-                    <>
-                      <UserPlus className="h-5 w-5 mr-2" />
-                      Create Account
-                    </>
-                  ) : (
-                    'Sign In'
-                  )}
-                </>
-              )}
-            </button>
-            
-            <div className="text-center">
+              
+              <div className="space-y-1.5 pb-2">
+                <label htmlFor="password" className="block text-xs font-semibold text-slate-300 uppercase tracking-widest ml-1">
+                  Secure Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all shadow-inner"
+                  placeholder="••••••••"
+                />
+              </div>
+              
               <button
-                type="button"
-                onClick={toggleMode}
-                className="text-blue-700 hover:text-blue-800 font-medium"
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white py-4 rounded-2xl font-semibold tracking-wide transition-all duration-300 flex justify-center items-center shadow-[0_0_20px_rgb(99,102,241,0.3)] hover:shadow-[0_0_30px_rgb(99,102,241,0.5)] transform hover:-translate-y-0.5"
               >
-                {isRegistering ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    {isRegistering ? (
+                      <>
+                        <UserPlus className="h-5 w-5 mr-2 opacity-80" />
+                        Initialize Account
+                      </>
+                    ) : (
+                      'Secure Login'
+                    )}
+                  </>
+                )}
               </button>
-            </div>
-          </form>
+              
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={toggleMode}
+                  className="text-slate-400 hover:text-white font-medium text-sm transition-colors border-b border-transparent hover:border-white pb-0.5"
+                >
+                  {isRegistering ? 'Already provisioned? Sign in' : 'Establish new credentials? Sign up'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
