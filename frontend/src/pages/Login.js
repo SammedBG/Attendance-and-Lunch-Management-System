@@ -2,32 +2,35 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Calendar, Utensils, UserCog, UserPlus } from 'lucide-react';
 import { api } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     
     try {
       if (isRegistering) {
         await api.post('/auth/register', { name, email, password });
+        toast.success('Account created! Signing you in...');
+      } else {
+        toast.loading('Authenticating...', { id: 'login-toast' });
       }
+      
       await login(email, password);
+      toast.success('Welcome back!', { id: 'login-toast' });
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      toast.error(err.response?.data?.message || 'Authentication failed', { id: 'login-toast' });
     }
   };
 
   const toggleMode = () => {
     setIsRegistering(!isRegistering);
-    setError('');
   };
 
   return (
@@ -81,11 +84,6 @@ const Login = () => {
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg">
-                {error}
-              </div>
-            )}
             
             {isRegistering && (
               <div>

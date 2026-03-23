@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Home, Briefcase } from 'lucide-react';
 import { format } from 'date-fns';
 import { attendanceService } from '../../services/api';
+import toast from 'react-hot-toast';
 
 const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
   const [status, setStatus] = useState(null);
@@ -23,7 +24,7 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
   useEffect(() => {
     if (isToday && isPastCutoff) {
       setIsDisabled(true);
-      setError("It's past 9:30 AM. Attendance marked now will be considered for tomorrow.");
+      setError("Notice: Cutoff has passed. Attendance marked now applies to tomorrow.");
     } else if (selectedDate < today && !isToday) {
       setIsDisabled(true);
       setError("Cannot mark attendance for past dates.");
@@ -72,16 +73,11 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
       }
       
       await attendanceService.markAttendance(status, targetDate);
-      setSuccessMessage(`Attendance marked successfully for ${isToday && isPastCutoff ? 'tomorrow' : 'today'}`);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      toast.success(`Attendance securely marked for ${isToday && isPastCutoff ? 'tomorrow' : 'today'}`);
       
       onAttendanceMarked();
     } catch (error) {
-      setError('Failed to mark attendance. Please try again.');
+      toast.error('Network failed to mark attendance. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -96,12 +92,6 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md">
           {error}
-        </div>
-      )}
-      
-      {successMessage && (
-        <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-md">
-          {successMessage}
         </div>
       )}
       
