@@ -3,8 +3,24 @@
 A robust, enterprise-grade full-stack web application designed to manage everyday employee attendance and accurately facilitate lunch planning for organizations. This system solves office logistic requirements by giving separate, dedicated operational dashboards to **Employees**, **Chefs**, and **Administrators** through a highly secure frontend/backend architecture.
 
 ![Architecture](https://img.shields.io/badge/Architecture-MERN-blue.svg)
-![Security](https://img.shields.io/badge/Security-HttpOnly_Cookies_|_Helmet_|_Rate_Limit-success.svg)
-![Deployment](https://img.shields.io/badge/Deployment-Docker_|_Render-orange.svg)
+![Security](https://img.shields.io/badge/Security-Dual_HttpOnly_Cookies_|_Helmet_|_Rate_Limit-success.svg)
+![Deployment](https://img.shields.io/badge/Deployment-Docker_|_Render_|_Vercel-orange.svg)
+
+---
+
+## 🔗 Live Demo & Sandbox
+
+If you are a company looking to evaluate this ecosystem before deployment, you can access the live demo environment here:
+* **Live Application:** `[Insert Your Vercel/Render URL Here]`
+* **Interactive API Swagger Docs:** `[Insert Your Vercel/Render URL Here]/api-docs`
+
+Use the following highly restrictive demo accounts to explore the different hierarchy dashboards safely:
+
+| Access Level | Email Address | Password | Function |
+| :--- | :--- | :--- | :--- |
+| **System Admin** | `admin@example.com` | `admin123` | Can view reports, trend analytics, and promote/demote user roles. |
+| **Head Chef** | `chef@example.com` | `chef123` | Can exclusively view the daily "Office" lunch count requirements. |
+| **Standard Employee**| `employee@example.com` | `employee123` | Can login, mark attendance, and view their personal calendar history. |
 
 ---
 
@@ -29,8 +45,9 @@ A robust, enterprise-grade full-stack web application designed to manage everyda
 ## 🛡️ "Like a Boss" Security
 
 This application has been relentlessly hardened against common web exploits:
-- **HttpOnly Cookies:** JWT authentication tokens are encrypted and hidden from JavaScript completely natively by the browser, rendering **XSS** token theft virtually impossible.
-- **Strict Rate Limiting:** Global endpoints enforce a cap to neutralize data scrapers. Furthermore, the `login` and `register` endpoints restrict IPs to **5 attempts per 15 minutes** to permanently shut down brute-force attacks.
+- **Military-Grade Auth (Dual Token Rotation):** JWTs are physically split into two HttpOnly cookies. A heavy Vault Token lives strictly in the background for 7 days, constantly re-generating an ultra-short-lived 15-minute Access Token dynamically behind the scenes. This acts as a virtually unbreakable defense against Cross-Site Scripting (XSS) and Session Hijacking.
+- **Strict Rate Limiting:** Global endpoints enforce a cap to neutralize data scrapers. The `login` and `register` endpoints strictly block IPs after **5 attempts per 15 minutes** to permanently shut down brute-force attacks.
+- **Winston Crash Observability:** The server maps natively to a rotating `backend/logs` directory, permanently stamping and debugging Stack Traces via `winston-daily-rotate-file`.
 - **NoSQL Injection Blocked:** All network payloads are recursively sanitized via `express-mongo-sanitize` prior to reaching the database model.
 - **Headers & Request Enforcement:** Powered by `helmet` security headers, strict exact-match date verifications, password complexity minimums, and strict environment deployment validation rules.
 
@@ -141,12 +158,27 @@ The Frontend will immediately become available mapped to `http://localhost:3000`
 
 ---
 
-## ☁️ Render Cloud Deployment
+## 🏢 Enterprise Production & Publishing Guide (For Companies)
 
-The repository includes a `render.yaml` Infrastructure-as-Code (IaC) configuration.
-If you connect your Render.com workspace to this repository, Render will natively extract the `render.yaml` file and simultaneously spin up Both the Web-App and Node API into production with zero-configuration required. 
+If your company wants to adopt and publish this exact system for your own office, follow these 3 zero-downtime deployment steps:
 
-*(Make sure you provide the `JWT_SECRET` and `MONGO_URI` strings within the Render environment dashboard!)*
+### Phase 1: Database Setup (MongoDB Atlas)
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Create a specific database user and whitelist the IP address `0.0.0.0/0` (allowing cloud servers to connect).
+3. Copy your MongoDB Connection String (URI).
+
+### Phase 2: Backend Publishing (Render)
+1. Create a free account on [Render.com](https://render.com/).
+2. Select **New Web Service** and connect your forked GitHub repository.
+3. Render will instantly detect the `render.yaml` file natively included in this repository.
+4. Go to **Environment Variables** on Render and explicitly paste your `MONGO_URI` and create two massive random string variables for `JWT_SECRET` and `JWT_REFRESH_SECRET`. 
+
+### Phase 3: Frontend Publishing (Vercel/Netlify)
+1. Create an account on [Vercel](https://vercel.com).
+2. Import the `frontend/` folder of your GitHub repository.
+3. In the Environment Variables tab, set `REACT_APP_API_URL` to point exactly to your new live Render Backend URL (e.g., `https://my-company-backend.onrender.com/api`).
+4. Vercel will build the React app and automatically assign it a globally fast CDN URL.
+5. *(Optional)* Add your company's custom `.com` domain name natively inside Vercel's Network settings!
 
 ---
 
@@ -162,7 +194,12 @@ On the initial server boot, the database identifies empty collections and dynami
 
 ---
 
-## 🌐 Complete API Ledger
+## 🌐 OpenAPI Swagger Playground
+
+If you want to manually test payloads without logging into the React UI or Postman, the backend automatically generates a beautiful Interactive Dashboard at:
+`http://localhost:5000/api-docs`
+
+## 📡 Complete REST API Ledger
 
 | Group | Method | Path | Security Level | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
