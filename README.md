@@ -11,8 +11,8 @@ A robust, enterprise-grade full-stack web application designed to manage everyda
 ## 🔗 Live Demo & Sandbox
 
 If you are a company looking to evaluate this ecosystem before deployment, you can access the live demo environment here:
-* **Live Application:** `https://attendance-and-lunch-management-sys.vercel.app/login`
-* **Interactive API Swagger Docs:** `https://attendance-and-lunch-management-system.onrender.com`
+* **Live Application:** https://attendance-and-lunch-management-sys.vercel.app/login
+* **Interactive API Swagger Docs:** https://attendance-and-lunch-management-system.onrender.com
 
 Use the following highly restrictive demo accounts to explore the different hierarchy dashboards safely:
 
