@@ -24,21 +24,31 @@ Use the following highly restrictive demo accounts to explore the different hier
 
 ---
 
-## 🚀 Key Features
+## ⚙️ How the Ecosystem Actually Works
 
-### 👨‍💻 Employee Dashboard
-- **Daily Check-Ins:** Mark attendance simply as `Office`, `Home`, or `Leave`.
-- **Calendar Perspective:** Visualize historical check-ins immediately via a monthly calendar widget.
-- **Automated Cutoff Enforcement:** Employees checking in past 9:30 AM (IST) automatically roll over to the next day, ensuring chef planning numbers stay entirely accurate regardless of individual timezone manipulations.
+The architecture runs on a strictly time-gated, three-tier user hierarchy. Every role intimately connects to produce a seamless daily flow of data:
 
-### 👨‍🍳 Chef Dashboard
-- **Real-Time Logistics:** View precise daily counts of incoming, on-site employees.
-- **Resource Management:** Plan meal preparations adequately based on real-time data, reducing food waste and ensuring nobody goes hungry.
+### 1. The Core Engine (9:30 AM IST Temporal Cutoff)
+Unlike standard applications, this platform utilizes hard-coded **Indian Standard Time (IST)** validation logic via backend controllers. 
+- At exactly **9:30 AM IST**, the backend dynamically slices the active day. 
+- If an Employee tries to mark their attendance *before* 9:30 AM, it applies to *today*. 
+- If they attempt to mark it at 9:31 AM, the frontend physically disables "Today" options and the backend mathematically forces their payload to execute for *tomorrow*. This ensures absolute data integrity for the kitchen.
 
-### 👑 Administrator Console
-- **Detailed Reports:** Analyze extensive daily and monthly attendance histories.
-- **O(1) Trend Graphs:** Track visual trends of Office/Home/Leave frequencies utilizing hyper-fast MongoDB aggregation pipelines.
-- **Role Management:** Full lifecycle control of users, allowing role swapping on the fly (Promote to Chef/Admin).
+### 2. 👨‍💻 Standard User (The Employee)
+The baseline account. Employees have a single, highly-focused dashboard.
+- **Action:** They declare their status as `Office` (Needs Lunch), `Home` (No Lunch), or `Leave` (Away).
+- **Vision:** They interact through a beautiful, color-coded React Calendar widget showing their exact historical footprint over the month.
+
+### 3. 👨‍🍳 Logistics Manager (The Chef)
+The Chef dashboard entirely abstracts complex data away and provides purely actionable real-time intel.
+- **Action:** The Chef logs in after the 9:30 AM cutoff locking window.
+- **Vision:** The MongoDB pipeline instantly groups and parses the entire company roster, spitting out a single, massive **Target Integer** representing exactly how many users selected `Office` for the exact current date. The Chef knows exactly how many meals to cook, permanently preventing massive food waste or accidental food shortages in the corporation.
+
+### 4. 👑 System Executive (The Administrator)
+The Admin dashboard is the 'God-Mode' omniscient observer.
+- **Macro Analytics:** Admins see beautifully rendered Recharts.js line and pie graphs. Through high-speed MongoDB `$group` aggregation routes, they can visualize weekly trends (e.g., "Are more employees selecting `Home` on Fridays?").
+- **Micro Intelligence:** Admins can query an exact date (e.g., "November 14th") and instantly see an immutable ledger proving exactly which individuals claimed which status.
+- **Access Control:** Admins possess full User Lifecycle state-management. They can view the entire application database roster and dynamically click a dropdown to instantly elevate an `employee` into a `chef` or fellow `admin`.
 
 ---
 
