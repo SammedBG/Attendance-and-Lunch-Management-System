@@ -24,61 +24,61 @@ router.post(
   roleMiddleware(['employee', 'admin']),
   validate(markAttendanceSchema),
   async (req, res) => {
-  try {
-    const { status, date } = req.body;
-    const userId = req.user.id;
+    try {
+      const { status, date } = req.body;
+      const userId = req.user.id;
 
     // Parse the incoming 'yyyy-MM-dd' string as UTC midnight
-    const reqDate = getUtcDateOnlyFromDateString(date);
-    if (!reqDate) {
-      return res.status(400).json({ message: 'Invalid date' });
-    }
+      const reqDate = getUtcDateOnlyFromDateString(date);
+      if (!reqDate) {
+        return res.status(400).json({ message: 'Invalid date' });
+      }
 
     // Calculate current 'today' reliably in IST (+05:30)
-    const istTime = getIstNow();
+      const istTime = getIstNow();
     
     // Create a UTC midnight representation representing the current IST day
-    const { start: today } = getUtcDayRangeForIstDate();
+      const { start: today } = getUtcDayRangeForIstDate();
 
-    if (reqDate.getTime() === today.getTime()) {
-      const currentHour = istTime.getUTCHours();
-      const currentMinute = istTime.getUTCMinutes();
-      
-      const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
-      
-      if (isPastCutoff) {
-         return res.status(400).json({ message: 'Past 9:30 AM cutoff time for today' });
+      if (reqDate.getTime() === today.getTime()) {
+        const currentHour = istTime.getUTCHours();
+        const currentMinute = istTime.getUTCMinutes();
+        
+        const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
+        
+        if (isPastCutoff) {
+          return res.status(400).json({ message: 'Past 9:30 AM cutoff time for today' });
+        }
+      } else if (reqDate.getTime() < today.getTime()) {
+        return res.status(400).json({ message: 'Cannot mark attendance for past dates' });
       }
-    } else if (reqDate.getTime() < today.getTime()) {
-       return res.status(400).json({ message: 'Cannot mark attendance for past dates' });
-    }
 
     // Check if an attendance record already exists for this exact date (now normalized)
-    const existingRecord = await Attendance.findOne({
-      userId,
-      date: reqDate
-    });
+      const existingRecord = await Attendance.findOne({
+        userId,
+        date: reqDate
+      });
 
-    if (existingRecord) {
-      // Update existing record
-      existingRecord.status = status;
-      await existingRecord.save();
-      return res.json(existingRecord);
-    }
+      if (existingRecord) {
+        // Update existing record
+        existingRecord.status = status;
+        await existingRecord.save();
+        return res.json(existingRecord);
+      }
 
     // Create new attendance record
-    const attendance = new Attendance({
-      userId,
-      date: reqDate,
-      status
-    });
+      const attendance = new Attendance({
+        userId,
+        date: reqDate,
+        status
+      });
 
-    await attendance.save();
-    res.status(201).json(attendance);
-  } catch (error) {
-    console.error('Attendance error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+      await attendance.save();
+      res.status(201).json(attendance);
+    } catch (error) {
+      console.error('Attendance error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // Get attendance records

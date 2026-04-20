@@ -9,6 +9,15 @@ const AttendanceStats = () => {
   const [error, setError] = useState('');
   const [range, setRange] = useState('7days');
   
+  const formatUtcLabel = (dateValue) => {
+    const date = new Date(dateValue);
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'UTC',
+      month: 'short',
+      day: '2-digit'
+    }).format(date);
+  };
+
   useEffect(() => {
     fetchTrends();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,7 +49,7 @@ const AttendanceStats = () => {
       
       // Convert data format for chart
       const chartData = response.data.map((item) => ({
-        date: format(new Date(item.date), 'MMM dd'),
+        date: formatUtcLabel(item.date),
         office: item.officeCount,
         home: item.homeCount,
         leave: item.leaveCount

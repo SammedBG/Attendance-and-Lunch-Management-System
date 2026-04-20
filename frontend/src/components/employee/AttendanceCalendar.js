@@ -10,6 +10,14 @@ const AttendanceCalendar = ({ onDateSelect }) => {
   const [attendanceData, setAttendanceData] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const toUtcDateString = (dateValue) => {
+    const date = new Date(dateValue);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const month = value.getMonth();
   const year = value.getFullYear();
 
@@ -26,7 +34,7 @@ const AttendanceCalendar = ({ onDateSelect }) => {
       
       const response = await attendanceService.getMonthlyAttendance(month, year);
       setAttendanceData(response.data.reduce((acc, item) => {
-        acc[format(new Date(item.date), 'yyyy-MM-dd')] = {
+        acc[toUtcDateString(item.date)] = {
           status: item.status
         };
         return acc;

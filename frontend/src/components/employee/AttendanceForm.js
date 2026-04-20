@@ -29,7 +29,7 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
   const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
   const isPastDate = new Date(`${formattedDate}T00:00:00.000Z`) < new Date(`${istToday}T00:00:00.000Z`);
   
-  // Disable form if trying to mark attendance for today after cutoff
+  // Update form state based on IST cutoff and past dates
   useEffect(() => {
     if (isPastDate) {
       setIsDisabled(true);
