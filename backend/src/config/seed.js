@@ -3,6 +3,10 @@ import User from '../models/User.js';
 
 export const seedData = async () => {
   try {
+    if (process.env.SEED_DATA !== 'true') {
+      return;
+    }
+
     // Check if there are existing users
     const count = await User.countDocuments();
     if (count === 0) {

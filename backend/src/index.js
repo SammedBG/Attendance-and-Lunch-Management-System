@@ -13,6 +13,8 @@ import { seedData } from './config/seed.js';
 import logger from './config/logger.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
+import { csrfMiddleware } from './middleware/csrf.js';
+import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -54,6 +56,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// CSRF protection for state-changing requests
+app.use('/api', csrfMiddleware);
+
 // Sanitize user-supplied data to prevent MongoDB Operator Injection
 app.use(mongoSanitize());
 
@@ -84,22 +89,15 @@ app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-  logger.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
   logger.info(`Enterprise Server running cleanly on port ${PORT}`);
   logger.info(`Swagger Sandbox live at http://localhost:${PORT}/api-docs`);
   setupCronJobs();
-  seedData();
+  if (process.env.SEED_DATA === 'true') {
+    seedData();
+  }
 });

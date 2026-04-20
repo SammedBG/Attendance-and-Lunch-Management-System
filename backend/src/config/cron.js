@@ -1,18 +1,16 @@
 import cron from 'node-cron';
 import Attendance from '../models/Attendance.js';
+import { getUtcDayRangeForIstDate } from '../utils/date.js';
 
 // Schedule daily notification for chef at 9:30 AM (except weekends)
 export const setupCronJobs = () => {
   cron.schedule('30 9 * * 1-5', async () => {
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const { start, end } = getUtcDayRangeForIstDate();
 
       // Count employees marked as 'office' for today
       const count = await Attendance.countDocuments({
-        date: { $gte: today, $lt: tomorrow },
+        date: { $gte: start, $lt: end },
         status: 'office'
       });
       
@@ -26,6 +24,8 @@ export const setupCronJobs = () => {
     } catch (error) {
       console.error('Chef notification error:', error);
     }
+  }, {
+    timezone: 'Asia/Kolkata'
   });
 
   console.log('Cron jobs scheduled');
