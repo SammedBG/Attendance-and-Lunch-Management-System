@@ -50,6 +50,13 @@ router.post('/register', authLimiter, validate(registerSchema), async (req, res)
   }
 });
 
+// Pre-auth CSRF token
+router.get('/csrf', (req, res) => {
+  const csrfToken = generateCsrfToken();
+  setCsrfCookie(res, csrfToken);
+  res.json({ message: 'CSRF token set' });
+});
+
 // Login
 router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
   try {

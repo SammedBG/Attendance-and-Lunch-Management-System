@@ -15,6 +15,8 @@ const Login = () => {
     e.preventDefault();
     
     try {
+      await api.get('/auth/csrf');
+
       if (isRegistering) {
         await api.post('/auth/register', { name, email, password });
         toast.success('Account created! Signing you in...');

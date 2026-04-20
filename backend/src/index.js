@@ -25,8 +25,20 @@ import chefRoutes from './routes/chef.js';
 // Load environment variables
 dotenv.config();
 
-if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key_here' && process.env.NODE_ENV === 'production') {
-  logger.warn('WARNING: Your JWT_SECRET is extremely weak or missing!');
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your_jwt_secret_key_here') {
+  if (isProduction) {
+    logger.error('FATAL: JWT_SECRET is missing or insecure in production.');
+    process.exit(1);
+  } else {
+    logger.warn('WARNING: Your JWT_SECRET is extremely weak or missing!');
+  }
+}
+
+if (isProduction && !process.env.JWT_REFRESH_SECRET) {
+  logger.error('FATAL: JWT_REFRESH_SECRET is required in production.');
+  process.exit(1);
 }
 
 // Initialize express app

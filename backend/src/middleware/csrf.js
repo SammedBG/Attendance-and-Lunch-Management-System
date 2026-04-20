@@ -26,8 +26,6 @@ export const csrfMiddleware = (req, res, next) => {
   }
 
   const exemptPaths = new Set([
-    '/auth/login',
-    '/auth/register',
     '/auth/refresh',
     '/health'
   ]);
