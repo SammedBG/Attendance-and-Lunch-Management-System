@@ -10,23 +10,33 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
   const [error, setError] = useState('');
   const [isDisabled, setIsDisabled] = useState(false);
   
+  const formatUtcDate = (date) => {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-  const today = new Date();
-  const isToday = format(today, 'yyyy-MM-dd') === formattedDate;
-  
-  // Check if current time is after 9:30 AM
-  const currentHour = today.getHours();
-  const currentMinute = today.getMinutes();
+  const now = new Date();
+  const istNow = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+  const istToday = formatUtcDate(istNow);
+  const isToday = formattedDate === istToday;
+
+  // Check if current time is after 9:30 AM IST
+  const currentHour = istNow.getUTCHours();
+  const currentMinute = istNow.getUTCMinutes();
   const isPastCutoff = currentHour > 9 || (currentHour === 9 && currentMinute >= 30);
+  const isPastDate = new Date(`${formattedDate}T00:00:00.000Z`) < new Date(`${istToday}T00:00:00.000Z`);
   
   // Disable form if trying to mark attendance for today after cutoff
   useEffect(() => {
-    if (isToday && isPastCutoff) {
-      setIsDisabled(true);
-      setError("Notice: Cutoff has passed. Attendance marked now applies to tomorrow.");
-    } else if (selectedDate < today && !isToday) {
+    if (isPastDate) {
       setIsDisabled(true);
       setError("Cannot mark attendance for past dates.");
+    } else if (isToday && isPastCutoff) {
+      setIsDisabled(false);
+      setError("Notice: Cutoff has passed. Attendance marked now applies to tomorrow.");
     } else {
       setIsDisabled(false);
       setError('');
@@ -66,9 +76,9 @@ const AttendanceForm = ({ selectedDate, onAttendanceMarked }) => {
       // If today and past cutoff, set date to tomorrow
       let targetDate = formattedDate;
       if (isToday && isPastCutoff) {
-        const tomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1);
-        targetDate = format(tomorrow, 'yyyy-MM-dd');
+        const istTomorrow = new Date(istNow);
+        istTomorrow.setUTCDate(istTomorrow.getUTCDate() + 1);
+        targetDate = formatUtcDate(istTomorrow);
       }
       
       await attendanceService.markAttendance(status, targetDate);

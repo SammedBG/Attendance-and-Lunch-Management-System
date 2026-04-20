@@ -99,7 +99,7 @@ const AttendanceCalendar = ({ onDateSelect }) => {
     return classes.join(' ');
   };
 
-  // Disable weekend days and past days
+  // Disable weekend days
   const tileDisabled = ({ date }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

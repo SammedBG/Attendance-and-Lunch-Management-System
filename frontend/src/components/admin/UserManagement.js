@@ -39,7 +39,7 @@ const UserManagement = () => {
       // Update local state
       setUsers(prevUsers => 
         prevUsers.map(user => 
-          user.id === userId ? { ...user, role: selectedRole } : user
+          (user.id || user._id) === userId ? { ...user, role: selectedRole } : user
         )
       );
       
@@ -103,8 +103,10 @@ const UserManagement = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user.id}>
+                users.map((user) => {
+                  const userId = user.id || user._id;
+                  return (
+                  <tr key={userId}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
@@ -121,7 +123,7 @@ const UserManagement = () => {
                       {user.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {editingUser === user.id ? (
+                      {editingUser === userId ? (
                         <select
                           value={selectedRole}
                           onChange={(e) => setSelectedRole(e.target.value)}
@@ -144,10 +146,10 @@ const UserManagement = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      {editingUser === user.id ? (
+                      {editingUser === userId ? (
                         <div className="flex justify-end space-x-2">
                           <button
-                            onClick={() => updateUserRole(user.id)}
+                            onClick={() => updateUserRole(userId)}
                             className="text-green-600 hover:text-green-900"
                           >
                             Save
@@ -161,7 +163,7 @@ const UserManagement = () => {
                         </div>
                       ) : (
                         <button
-                          onClick={() => handleRoleEdit(user.id, user.role)}
+                          onClick={() => handleRoleEdit(userId, user.role)}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           Edit Role
@@ -169,7 +171,8 @@ const UserManagement = () => {
                       )}
                     </td>
                   </tr>
-                ))
+                );
+                })
               ) : (
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
