@@ -2,25 +2,43 @@ import express from 'express';
 import Attendance from '../models/Attendance.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { roleMiddleware } from '../middleware/role.js';
+import { validate } from '../middleware/validate.js';
+import {
+  getAttendanceSchema,
+  getMonthlyAttendanceSchema,
+  markAttendanceSchema
+} from '../validators/attendance.validator.js';
+import {
+  getIstNow,
+  getUtcDateOnlyFromDateString,
+  getUtcDayRangeForIstDate,
+  getUtcDayRangeFromDateString
+} from '../utils/date.js';
 
 const router = express.Router();
 
 // Mark attendance
-router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (req, res) => {
+router.post(
+  '/',
+  authMiddleware,
+  roleMiddleware(['employee', 'admin']),
+  validate(markAttendanceSchema),
+  async (req, res) => {
   try {
     const { status, date } = req.body;
     const userId = req.user.id;
 
     // Parse the incoming 'yyyy-MM-dd' string as UTC midnight
-    const reqDate = new Date(date);
-    reqDate.setUTCHours(0, 0, 0, 0);
+    const reqDate = getUtcDateOnlyFromDateString(date);
+    if (!reqDate) {
+      return res.status(400).json({ message: 'Invalid date' });
+    }
 
     // Calculate current 'today' reliably in IST (+05:30)
-    const now = new Date();
-    const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    const istTime = getIstNow();
     
     // Create a UTC midnight representation representing the current IST day
-    const today = new Date(Date.UTC(istTime.getUTCFullYear(), istTime.getUTCMonth(), istTime.getUTCDate()));
+    const { start: today } = getUtcDayRangeForIstDate();
 
     if (reqDate.getTime() === today.getTime()) {
       const currentHour = istTime.getUTCHours();
@@ -64,19 +82,22 @@ router.post('/', authMiddleware, roleMiddleware(['employee', 'admin']), async (r
 });
 
 // Get attendance records
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, validate(getAttendanceSchema, 'query'), async (req, res) => {
   try {
     const { date } = req.query;
     const userId = req.user.id;
 
     if (date) {
       // Get attendance for specific date
-      const startDate = new Date(date);
-      const endDate = new Date(new Date(date).setDate(new Date(date).getDate() + 1));
+      const range = getUtcDayRangeFromDateString(date);
+      if (!range) {
+        return res.status(400).json({ message: 'Invalid date' });
+      }
+      const { start, end } = range;
 
       const attendance = await Attendance.findOne({
         userId,
-        date: { $gte: startDate, $lt: endDate }
+        date: { $gte: start, $lt: end }
       });
       
       return res.json(attendance || { date, status: null });
@@ -92,17 +113,19 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Get monthly attendance
-router.get('/monthly', authMiddleware, async (req, res) => {
+router.get('/monthly', authMiddleware, validate(getMonthlyAttendanceSchema, 'query'), async (req, res) => {
   try {
     const { month, year } = req.query;
     const userId = req.user.id;
 
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
+    const monthNumber = Number(month);
+    const yearNumber = Number(year);
+    const startDate = new Date(Date.UTC(yearNumber, monthNumber - 1, 1));
+    const endDate = new Date(Date.UTC(yearNumber, monthNumber, 1));
 
     const attendanceRecords = await Attendance.find({
       userId,
-      date: { $gte: startDate, $lte: endDate }
+      date: { $gte: startDate, $lt: endDate }
     }).sort({ date: 1 });
 
     res.json(attendanceRecords);

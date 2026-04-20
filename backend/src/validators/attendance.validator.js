@@ -44,3 +44,13 @@ export const getMonthlyAttendanceSchema = Joi.object({
       'any.required': 'Year is required',
     }),
 });
+
+export const getAttendanceSchema = Joi.object({
+  date: Joi.date()
+    .iso()
+    .optional()
+    .messages({
+      'date.base': 'Please provide a valid date',
+      'date.format': 'Date must be in ISO format (YYYY-MM-DD)'
+    }),
+});

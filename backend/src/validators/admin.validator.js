@@ -29,3 +29,13 @@ export const dateRangeSchema = Joi.object({
       'any.required': 'End date is required',
     }),
 });
+
+export const dailyReportSchema = Joi.object({
+  date: Joi.date()
+    .iso()
+    .optional()
+    .messages({
+      'date.base': 'Please provide a valid date',
+      'date.format': 'Date must be in ISO format (YYYY-MM-DD)'
+    }),
+});

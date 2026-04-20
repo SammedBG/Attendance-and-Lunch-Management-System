@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { loginSchema, registerSchema } from '../validators/auth.validator.js';
+import { clearCsrfCookie, generateCsrfToken, setCsrfCookie } from '../middleware/csrf.js';
 
 const router = express.Router();
 
@@ -17,25 +20,9 @@ const authLimiter = rateLimit({
 });
 
 // Register
-router.post('/register', authLimiter, async (req, res) => {
+router.post('/register', authLimiter, validate(registerSchema), async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    // Validate input
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    // Validate email format basic structure
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Please provide a valid email address' });
-    }
-
-    // Enforce Password complexity
-    if (password.length < 8) {
-      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
-    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -64,7 +51,7 @@ router.post('/register', authLimiter, async (req, res) => {
 });
 
 // Login
-router.post('/login', authLimiter, async (req, res) => {
+router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -114,6 +101,9 @@ router.post('/login', authLimiter, async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
+    const csrfToken = generateCsrfToken();
+    setCsrfCookie(res, csrfToken);
+
     res.json({
       user: {
         id: user._id,
@@ -162,6 +152,9 @@ router.post('/refresh', async (req, res) => {
       maxAge: 15 * 60 * 1000 // 15 Mins
     });
 
+    const csrfToken = generateCsrfToken();
+    setCsrfCookie(res, csrfToken);
+
     res.json({ message: 'Access smoothly restored' });
 
   } catch (error) {
@@ -183,11 +176,16 @@ router.post('/logout', (req, res) => {
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/api/auth/refresh',
   });
+  clearCsrfCookie(res);
   res.json({ message: 'Logged out successfully' });
 });
 
 // Get current user
 router.get('/me', authMiddleware, (req, res) => {
+  if (!req.cookies?.csrfToken) {
+    const csrfToken = generateCsrfToken();
+    setCsrfCookie(res, csrfToken);
+  }
   res.json(req.user);
 });
 

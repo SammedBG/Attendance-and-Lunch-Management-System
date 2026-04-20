@@ -8,14 +8,43 @@ export const api = axios.create({
   },
 });
 
+const getCookieValue = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+  return null;
+};
+
+const shouldAttachCsrf = (method) => {
+  const normalized = method?.toLowerCase();
+  return ['post', 'put', 'patch', 'delete'].includes(normalized);
+};
+
+// Attach CSRF token for state-changing requests
+api.interceptors.request.use((config) => {
+  if (shouldAttachCsrf(config.method)) {
+    const csrfToken = getCookieValue('csrfToken');
+    if (csrfToken) {
+      config.headers['x-csrf-token'] = csrfToken;
+    }
+  }
+  return config;
+});
+
 // Add automatic token refresh interceptor for managing short-lived JWT Cookies
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const url = originalRequest?.url || '';
+    const isAuthExcluded = url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/refresh');
     
     // If we catch a 401 Unauthorized, and we haven't tried to refresh yet, AND it's not the actual auth routes failing
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/')) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthExcluded) {
       originalRequest._retry = true;
       
       try {

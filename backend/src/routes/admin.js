@@ -3,45 +3,59 @@ import Attendance from '../models/Attendance.js';
 import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { roleMiddleware } from '../middleware/role.js';
+import { validate } from '../middleware/validate.js';
+import {
+  dateRangeSchema,
+  dailyReportSchema,
+  updateUserRoleSchema
+} from '../validators/admin.validator.js';
+import {
+  getUtcDateOnlyFromDateString,
+  getUtcDayRangeForIstDate,
+  getUtcDayRangeFromDateString
+} from '../utils/date.js';
 
 const router = express.Router();
 
 
 // Get daily report
-router.get('/reports/daily', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+router.get(
+  '/reports/daily',
+  authMiddleware,
+  roleMiddleware(['admin']),
+  validate(dailyReportSchema, 'query'),
+  async (req, res) => {
   try {
     const { date } = req.query;
 
-    let targetDate;
-    if (date) {
-      targetDate = new Date(date);
-    } else {
-      targetDate = new Date();
+    const range = date
+      ? getUtcDayRangeFromDateString(date)
+      : getUtcDayRangeForIstDate();
+    if (!range) {
+      return res.status(400).json({ message: 'Invalid date' });
     }
 
-    targetDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(targetDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const { start, end } = range;
     
     // Get counts for each status
     const officeCount = await Attendance.countDocuments({
-      date: { $gte: targetDate, $lt: nextDay },
+      date: { $gte: start, $lt: end },
       status: 'office'
     });
 
     const homeCount = await Attendance.countDocuments({
-      date: { $gte: targetDate, $lt: nextDay },
+      date: { $gte: start, $lt: end },
       status: 'home'
     });
 
     const leaveCount = await Attendance.countDocuments({
-      date: { $gte: targetDate, $lt: nextDay },
+      date: { $gte: start, $lt: end },
       status: 'leave'
     });
 
     // Get details of employees with their status
     const attendanceRecords = await Attendance.find({
-      date: { $gte: targetDate, $lt: nextDay }
+      date: { $gte: start, $lt: end }
     }).populate('userId', 'name email');
 
     const employees = attendanceRecords
@@ -54,7 +68,7 @@ router.get('/reports/daily', authMiddleware, roleMiddleware(['admin']), async (r
       }));
     
     res.json({
-      date: targetDate,
+      date: start,
       officeCount,
       homeCount,
       leaveCount,
@@ -67,18 +81,27 @@ router.get('/reports/daily', authMiddleware, roleMiddleware(['admin']), async (r
 });
 
 // Get attendance trends
-router.get('/reports/trends', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+router.get(
+  '/reports/trends',
+  authMiddleware,
+  roleMiddleware(['admin']),
+  validate(dateRangeSchema, 'query'),
+  async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    const start = getUtcDateOnlyFromDateString(startDate);
+    const end = getUtcDateOnlyFromDateString(endDate);
+    if (!start || !end) {
+      return res.status(400).json({ message: 'Invalid date range' });
+    }
+    const endExclusive = new Date(end);
+    endExclusive.setUTCDate(endExclusive.getUTCDate() + 1);
 
     const trends = await Attendance.aggregate([
       {
         $match: {
-          date: { $gte: start, $lte: end }
+          date: { $gte: start, $lt: endExclusive }
         }
       },
       {
@@ -112,7 +135,13 @@ router.get('/reports/trends', authMiddleware, roleMiddleware(['admin']), async (
 router.get('/users', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    res.json(users);
+    const formattedUsers = users.map(user => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }));
+    res.json(formattedUsers);
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -120,14 +149,15 @@ router.get('/users', authMiddleware, roleMiddleware(['admin']), async (req, res)
 });
 
 // Update user role
-router.put('/users/:userId/role', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+router.put(
+  '/users/:userId/role',
+  authMiddleware,
+  roleMiddleware(['admin']),
+  validate(updateUserRoleSchema),
+  async (req, res) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
-
-    if (!['admin', 'employee', 'chef'].includes(role)) {
-      return res.status(400).json({ message: 'Invalid role' });
-    }
 
     const user = await User.findById(userId);
     if (!user) {

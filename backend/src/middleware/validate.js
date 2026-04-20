@@ -22,7 +22,7 @@ export const validate = (schema, property = 'body') => {
 
       return res.status(400).json({
         success: false,
-        message: 'Validation error',
+        message: errors[0]?.message || 'Validation error',
         errors,
       });
     }
