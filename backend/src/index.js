@@ -101,6 +101,11 @@ app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
+// Root endpoint to avoid 404 noise on platform health checks
+app.get('/', (req, res) => {
+  res.json({ message: 'API is running. Use /api for endpoints.' });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 
